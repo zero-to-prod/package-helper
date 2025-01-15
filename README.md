@@ -17,12 +17,13 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Example](#example)
 - [Local Development](./LOCAL_DEVELOPMENT.md)
 - [Contributing](#contributing)
 
 ## Introduction
 
-
+Helpers for a composer package.
 
 ## Requirements
 
@@ -40,7 +41,76 @@ This will add the package to your project’s dependencies and create an autoloa
 
 ## Usage
 
+Publish files in your package directory.
 
+```php
+use Zerotoprod\OmdbModels\PackageHelper;
+
+PackageHelper::publish(
+    $from,
+    $to,
+    PackageHelper::findNamespaceMapping($psr_4, $to),
+    static function(string $from, string $to){
+        echo "Copied: $from to $to" . PHP_EOL;
+    }
+);
+```
+
+## Example
+
+Integrate this into a composer package.
+
+Update `composer.json`:
+
+```json
+{
+  "bin": [
+    "bin/package-file"
+  ]
+}
+```
+
+Create a new file: `bin/package-file`
+
+```php
+#!/usr/bin/env php
+<?php
+
+require getcwd() . '/vendor/autoload.php';
+
+use Zerotoprod\OmdbModels\PackageHelper;
+
+if ($argc !== 2) {
+    die("Usage: <targetDir>\n");
+}
+
+$from = __DIR__ . '/../src';
+if (!is_dir($from)) {
+    throw new RuntimeException("Source directory '$from' not found.");
+}
+
+$composer_json_file_path = getcwd() . '/composer.json';
+if (!is_file($composer_json_file_path)) {
+    throw new RuntimeException("composer.json not found.");
+}
+
+$composer_json_data = json_decode(file_get_contents($composer_json_file_path), true);
+$psr_4 = $composer_json_data['autoload']['psr-4'] ?? null;
+
+if (!$psr_4) {
+    throw new RuntimeException('PSR-4 autoload section missing in composer.json.');
+}
+
+$to = rtrim($argv[1], '/');
+PackageHelper::publish(
+    $from,
+    $to,
+    PackageHelper::findNamespaceMapping($psr_4, $to),
+    static function(string $from, string $to){
+        echo "Copied: $from to $to" . PHP_EOL;
+    }
+);
+```
 
 ## Contributing
 
