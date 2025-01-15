@@ -14,6 +14,10 @@ class PackageHelper
 
     public static function determineNamespace(array $psr_4, string $to): string
     {
+        if (!is_dir($to) && !mkdir($to, 0777, true) && !is_dir($to)) {
+            throw new RuntimeException("Directory '$to' could not be created.");
+        }
+
         $realpath = realpath($to);
         if (!$realpath) {
             throw new RuntimeException("Directory '$to' does not exist or is not readable.");
@@ -25,7 +29,7 @@ class PackageHelper
                 $relative_path = trim(substr($realpath, strlen($normalized_path)), DIRECTORY_SEPARATOR);
 
                 return rtrim($namespace, '\\')
-                    . ($relative_path ? '\\' . str_replace(DIRECTORY_SEPARATOR, '\\', $relative_path) : '');
+                    .($relative_path ? '\\'.str_replace(DIRECTORY_SEPARATOR, '\\', $relative_path) : '');
             }
         }
 
