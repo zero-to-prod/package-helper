@@ -10,3 +10,8 @@
 /README.md                export-ignore
 /SECURITY.md              export-ignore
 /test.sh                  export-ignore
+/LOCAL_DEVELOPMENT.md     export-ignore
+/docker/                  export-ignore
+/docker-compose.yml       export-ignore
+/dock                     export-ignore
+/test.sh                  export-ignore
