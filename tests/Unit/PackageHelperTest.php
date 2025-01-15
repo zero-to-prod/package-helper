@@ -52,7 +52,7 @@ class PackageHelperTest extends TestCase
         // Now we call the method with a relative path.
         // With the fix, realpath('./src/Models') should yield
         // something like /tmp/<random>/to_dir/src/Models
-        $result = PackageHelper::findNamespaceMapping($mapping, './src/Models');
+        $result = PackageHelper::determineNamespace($mapping, './src/Models');
 
         // Ensure we get back the correct namespace
         $this->assertSame('App\\Models', $result);
@@ -108,12 +108,12 @@ class PackageHelperTest extends TestCase
         //    Now that realpath($appControllersDir) is valid, the method won't fail early.
         $this->assertSame(
             'App\\Controllers',
-            PackageHelper::findNamespaceMapping($mapping, $appControllersDir)
+            PackageHelper::determineNamespace($mapping, $appControllersDir)
         );
 
         $this->assertSame(
             'Lib\\Utils',
-            PackageHelper::findNamespaceMapping($mapping, $libUtilsDir)
+            PackageHelper::determineNamespace($mapping, $libUtilsDir)
         );
 
         // 5) Cleanup after ourselves
@@ -159,7 +159,7 @@ class PackageHelperTest extends TestCase
 
         // Because $unknownDirectory doesn't start with /var/www/app or /var/www/lib,
         // it should trigger "No matching PSR-4 mapping found" once realpath() returns a valid path.
-        PackageHelper::findNamespaceMapping($mapping, $unknownDirectory);
+        PackageHelper::determineNamespace($mapping, $unknownDirectory);
 
         // Cleanup
         rmdir($unknownDirectory);
