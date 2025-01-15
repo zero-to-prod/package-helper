@@ -1,6 +1,6 @@
 {
     "name": "zero-to-prod/package-helper",
-    "description": "package-helper",
+    "description": "Helpers for a Composer Package",
     "license": "MIT",
     "type": "library",
     "keywords": ["zero-to-prod", "package-helper"],
