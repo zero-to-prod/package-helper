@@ -78,7 +78,7 @@ Create a new file: `bin/package-file`
 
 require getcwd() . '/vendor/autoload.php';
 
-use Zerotoprod\OmdbModels\PackageHelper;
+use Zerotoprod\PackageHelper\PackageHelper;
 
 if ($argc !== 2) {
     die("Usage: <targetDir>\n");
@@ -105,7 +105,7 @@ $to = rtrim($argv[1], '/');
 PackageHelper::publish(
     $from,
     $to,
-    PackageHelper::findNamespaceMapping($psr_4, $to),
+    PackageHelper::determineNamespace($psr_4, $to),
     static function(string $from, string $to){
         echo "Copied: $from to $to" . PHP_EOL;
     }

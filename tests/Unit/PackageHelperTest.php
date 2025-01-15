@@ -34,18 +34,28 @@ class PackageHelperTest extends TestCase
         parent::tearDown();
     }
 
-    private function deleteDirectory(string $dir): void
+    public function testFindNamespaceMappingWithRelativePath(): void
     {
-        if (!is_dir($dir)) {
-            return;
-        }
+        // Create a directory structure inside $this->testToDir
+        // so we can get a realpath that actually exists.
+        $relativeDir = $this->testToDir . '/src/Models';
+        mkdir($relativeDir, 0777, true);
 
-        $iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
-        $files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::CHILD_FIRST);
-        foreach ($files as $file) {
-            $file->isDir() ? rmdir($file) : unlink($file);
-        }
-        rmdir($dir);
+        // Map "App\" => $this->testToDir . '/src'
+        $mapping = [
+            'App\\' => $this->testToDir . '/src',
+        ];
+
+        // Change into $this->testToDir so that "./src/Models" is valid
+        chdir($this->testToDir);
+
+        // Now we call the method with a relative path.
+        // With the fix, realpath('./src/Models') should yield
+        // something like /tmp/<random>/to_dir/src/Models
+        $result = PackageHelper::determineNamespace($mapping, './src/Models');
+
+        // Ensure we get back the correct namespace
+        $this->assertSame('App\\Models', $result);
     }
 
     public function testPublishCopiesFilesWithUpdatedNamespace(): void
@@ -77,32 +87,81 @@ class PackageHelperTest extends TestCase
 
     public function testFindNamespaceMappingReturnsCorrectNamespace(): void
     {
+        // 1) Create a temporary base directory for this test.
+        //    We'll store everything under sys_get_temp_dir() to ensure the path exists for realpath().
+        $baseDir = sys_get_temp_dir() . '/my-test-dir-' . uniqid();
+
+        // 2) Create sub-directories: app/Controllers and lib/Utils
+        $appControllersDir = $baseDir . '/app/Controllers';
+        $libUtilsDir       = $baseDir . '/lib/Utils';
+
+        mkdir($appControllersDir, 0777, true);
+        mkdir($libUtilsDir, 0777, true);
+
+        // 3) Set up the PSR-4 mapping to point to these real directories on disk.
         $mapping = [
-            'App\\' => '/var/www/app',
-            'Lib\\' => '/var/www/lib',
+            'App\\' => $baseDir . '/app',
+            'Lib\\' => $baseDir . '/lib',
         ];
 
+        // 4) Assert that findNamespaceMapping() returns what we expect.
+        //    Now that realpath($appControllersDir) is valid, the method won't fail early.
         $this->assertSame(
             'App\\Controllers',
-            PackageHelper::findNamespaceMapping($mapping, '/var/www/app/Controllers')
+            PackageHelper::determineNamespace($mapping, $appControllersDir)
         );
 
         $this->assertSame(
             'Lib\\Utils',
-            PackageHelper::findNamespaceMapping($mapping, '/var/www/lib/Utils')
+            PackageHelper::determineNamespace($mapping, $libUtilsDir)
         );
+
+        // 5) Cleanup after ourselves
+        //    (Optional if your test harness auto-cleans tmp directories.)
+        $this->deleteDirectory($baseDir);
+    }
+
+    /**
+     * Recursively delete a directory.
+     */
+    private function deleteDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $items = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($items as $item) {
+            $item->isDir() ? rmdir($item) : unlink($item);
+        }
+        rmdir($dir);
     }
 
     public function testFindNamespaceMappingThrowsExceptionForNoMatch(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("No matching PSR-4 mapping found for directory '/unknown/path'.");
+        $unknownDirectory = sys_get_temp_dir() . '/unknown-test';
+        // Make sure it’s empty or doesn’t match your PSR-4
+        mkdir($unknownDirectory);
+
+        // This ensures the directory physically exists for realpath().
+        // Now the code won't throw "Directory does not exist..."
+        // but will continue to the mismatch logic.
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("No matching PSR-4 mapping found for directory '$unknownDirectory'.");
 
         $mapping = [
             'App\\' => '/var/www/app',
             'Lib\\' => '/var/www/lib',
         ];
 
-        PackageHelper::findNamespaceMapping($mapping, '/unknown/path');
+        // Because $unknownDirectory doesn't start with /var/www/app or /var/www/lib,
+        // it should trigger "No matching PSR-4 mapping found" once realpath() returns a valid path.
+        PackageHelper::determineNamespace($mapping, $unknownDirectory);
+
+        // Cleanup
+        rmdir($unknownDirectory);
     }
 }
