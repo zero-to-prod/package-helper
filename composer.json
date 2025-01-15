@@ -1,11 +1,11 @@
 {
-    "name": "zero-to-prod/:package_slug",
-    "description": ":package_slug",
+    "name": "zero-to-prod/package-helper",
+    "description": "package-helper",
     "license": "MIT",
     "type": "library",
-    "keywords": ["zero-to-prod", ":package_slug"],
+    "keywords": ["zero-to-prod", "package-helper"],
     "readme": "./README.md",
-    "time": ":time",
+    "time": "2025-01-15",
     "authors": [
         {
             "name": "David Smith",
@@ -14,13 +14,13 @@
             "role": "maintainer"
         }
     ],
-    "homepage": "https://github.com/zero-to-prod/:package_slug",
+    "homepage": "https://github.com/zero-to-prod/package-helper",
     "support": {
         "email": "dave0016@gmail.com",
-        "issues": "https://github.com/zero-to-prod/:package_slug/issues",
-        "source": "https://github.com/zero-to-prod/:package_slug",
-        "docs": "https://zero-to-prod.github.io/:package_slug/",
-        "security": "https://github.com/zero-to-prod/:package_slug/blob/main/SECURITY.md"
+        "issues": "https://github.com/zero-to-prod/package-helper/issues",
+        "source": "https://github.com/zero-to-prod/package-helper",
+        "docs": "https://zero-to-prod.github.io/package-helper/",
+        "security": "https://github.com/zero-to-prod/package-helper/blob/main/SECURITY.md"
     },
     "funding": [
         {
@@ -29,14 +29,15 @@
         }
     ],
     "require": {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "zero-to-prod/dock": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*"
     },
     "autoload": {
         "psr-4": {
-            "Zerotoprod\\:package_namespace\\": "src/"
+            "Zerotoprod\\PackageHelper\\": "src/"
         }
     },
     "autoload-dev": {
