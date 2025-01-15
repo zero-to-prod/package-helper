@@ -12,17 +12,17 @@ class PackageHelper
         (new self())->copyFiles($from, $to, $project_namespace, $CopyEvent);
     }
 
-    public static function findNamespaceMapping(array $psr_4, string $to): string
+    public static function determineNamespace(array $psr_4, string $to): string
     {
-        $toReal = realpath($to);
-        if (!$toReal) {
+        $realpath = realpath($to);
+        if (!$realpath) {
             throw new RuntimeException("Directory '$to' does not exist or is not readable.");
         }
 
         foreach ($psr_4 as $namespace => $path) {
-            $normalizedPath = realpath(rtrim($path, '/'));
-            if ($normalizedPath && strpos($toReal, $normalizedPath) === 0) {
-                $relative_path = trim(substr($toReal, strlen($normalizedPath)), DIRECTORY_SEPARATOR);
+            $normalized_path = realpath(rtrim($path, '/'));
+            if ($normalized_path && strpos($realpath, $normalized_path) === 0) {
+                $relative_path = trim(substr($realpath, strlen($normalized_path)), DIRECTORY_SEPARATOR);
 
                 return rtrim($namespace, '\\')
                     . ($relative_path ? '\\' . str_replace(DIRECTORY_SEPARATOR, '\\', $relative_path) : '');
