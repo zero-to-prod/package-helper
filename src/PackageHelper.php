@@ -14,12 +14,18 @@ class PackageHelper
 
     public static function findNamespaceMapping(array $psr_4, string $to): string
     {
-        foreach ($psr_4 as $namespace => $path) {
-            $normalized_path = rtrim($path, '/');
-            if (strpos($to, $normalized_path) === 0) {
-                $relative_path = trim(substr($to, strlen($normalized_path)), '/');
+        $toReal = realpath($to);
+        if (!$toReal) {
+            throw new RuntimeException("Directory '$to' does not exist or is not readable.");
+        }
 
-                return rtrim($namespace, '\\').($relative_path ? '\\'.str_replace('/', '\\', $relative_path) : '');
+        foreach ($psr_4 as $namespace => $path) {
+            $normalizedPath = realpath(rtrim($path, '/'));
+            if ($normalizedPath && strpos($toReal, $normalizedPath) === 0) {
+                $relative_path = trim(substr($toReal, strlen($normalizedPath)), DIRECTORY_SEPARATOR);
+
+                return rtrim($namespace, '\\')
+                    . ($relative_path ? '\\' . str_replace(DIRECTORY_SEPARATOR, '\\', $relative_path) : '');
             }
         }
 
