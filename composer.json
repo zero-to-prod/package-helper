@@ -29,8 +29,7 @@
         }
     ],
     "require": {
-        "php": ">=7.1",
-        "zero-to-prod/dock": "^1.0"
+        "php": ">=7.1"
     },
     "require-dev": {
         "phpunit/phpunit": "*"
