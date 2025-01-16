@@ -34,7 +34,7 @@ Helpers for a composer package.
 Install `Zerotoprod\PackageHelper` via [Composer](https://getcomposer.org/):
 
 ```bash
-composer require zero-to-prod/package-helper
+composer require zero-to-prod/package-helper --dev
 ```
 
 This will add the package to your project’s dependencies and create an autoloader entry for it.
