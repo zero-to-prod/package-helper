@@ -3,7 +3,7 @@
 ![](art/logo.png)
 
 [![Repo](https://img.shields.io/badge/github-gray?logo=github)](https://github.com/zero-to-prod/package-helper)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zero-to-prod/package-helper/test.yml?label=tests)](https://github.com/zero-to-prod/package-helper/actions)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/zero-to-prod/package-helper/test.yml?label=test)](https://github.com/zero-to-prod/package-helper/actions)
 [![Packagist Downloads](https://img.shields.io/packagist/dt/zero-to-prod/package-helper?color=blue)](https://packagist.org/packages/zero-to-prod/package-helper/stats)
 [![php](https://img.shields.io/packagist/php-v/zero-to-prod/package-helper.svg?color=purple)](https://packagist.org/packages/zero-to-prod/package-helper/stats)
 [![Packagist Version](https://img.shields.io/packagist/v/zero-to-prod/package-helper?color=f28d1a)](https://packagist.org/packages/zero-to-prod/package-helper)
