@@ -1,10 +1,9 @@
-FROM php:7.2-cli AS builder
+FROM php:7.2-alpine AS builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     git \
     unzip \
-    $PHPIZE_DEPS \
-  && rm -rf /var/lib/apt/lists/*
+    $PHPIZE_DEPS
 
 RUN git config --global --add safe.directory /app
 
@@ -18,11 +17,13 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
 
 FROM builder AS debug
 
-RUN pecl channel-update pecl.php.net \
-  && pecl install xdebug-2.9.8 \
-  && docker-php-ext-enable xdebug
+RUN apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS \
+    && pecl channel-update pecl.php.net \
+    && pecl install xdebug-2.9.8 \
+    && docker-php-ext-enable xdebug \
+    && apk del .phpize-deps
 
-FROM php:7.2-cli AS base
+FROM php:7.2-alpine AS base
 
 WORKDIR /app
 
