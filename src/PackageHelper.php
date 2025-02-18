@@ -5,13 +5,24 @@ namespace Zerotoprod\PackageHelper;
 use Closure;
 use RuntimeException;
 
+/**
+ * Helpers for a Composer Package
+ *
+ * @link https://github.com/zero-to-prod/package-helper
+ */
 class PackageHelper
 {
+    /**
+     * @link https://github.com/zero-to-prod/package-helper
+     */
     public static function publish(string $from, string $to, string $project_namespace, Closure $CopyEvent = null): void
     {
         (new self())->copyFiles($from, $to, $project_namespace, $CopyEvent);
     }
 
+    /**
+     * @link https://github.com/zero-to-prod/package-helper
+     */
     public static function determineNamespace(array $psr_4, string $to): string
     {
         if (!is_dir($to) && !mkdir($to, 0777, true) && !is_dir($to)) {
