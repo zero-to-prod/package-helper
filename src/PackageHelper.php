@@ -2,6 +2,7 @@
 
 namespace Zerotoprod\PackageHelper;
 
+use Closure;
 use RuntimeException;
 
 /**
@@ -31,9 +32,9 @@ class PackageHelper
      * );
      *```
      *
-     * @param  string         $from               Source directory to publish (absolute or relative)
-     * @param  string         $to                 Destination directory in the consuming project
-     * @param  string         $project_namespace  Root namespace that corresponds to $to (e.g., 'App\\Services')
+     * @param  string        $from               Source directory to publish (absolute or relative)
+     * @param  string        $to                 Destination directory in the consuming project
+     * @param  string        $project_namespace  Root namespace that corresponds to $to (e.g., 'App\\Services')
      * @param  Closure|null  $CopyEvent          Optional callback ($fromFile, $toFile) invoked per copied file
      *
      * @return void
@@ -65,8 +66,8 @@ class PackageHelper
      * // $to now contains the full path of the copied file
      *```
      *
-     * @param  string         $source_file  The file to copy
-     * @param  string|null    $target_path  Directory to copy into (created if missing); defaults to getcwd()
+     * @param  string        $source_file  The file to copy
+     * @param  string|null   $target_path  Directory to copy into (created if missing); defaults to getcwd()
      * @param  Closure|null  $CopyEvent    Optional callback ($fromFile, $toFile)
      *
      * @return string The full path of the copied file
