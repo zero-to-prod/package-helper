@@ -7,16 +7,16 @@
  * Publishes the README.md file to the user's documentation directory.
  */
 
-require getcwd() . '/vendor/autoload.php';
+require getcwd().'/vendor/autoload.php';
 
 use Zerotoprod\PackageHelper\PackageHelper;
 
-$target_path = getcwd() . '/docs/zero-to-prod/package-helper/';
+$target_path = getcwd().'/docs/zero-to-prod/package-helper/';
 if (isset($argv[1])) {
-    $target_path = rtrim($argv[1], '/') . '/';
+    $target_path = rtrim($argv[1], '/').'/';
 }
 
-$source_file = __DIR__ . '/../README.md';
+$source_file = getcwd().'/README.md';
 
 if (!file_exists($source_file)) {
     fwrite(STDERR, "Error: Not found $source_file\n");
@@ -25,10 +25,10 @@ if (!file_exists($source_file)) {
 
 // Use PackageHelper to perform the copy (will create the target directory as needed)
 try {
-    PackageHelper::copy($source_file, $target_path);
+    PackageHelper::copy($source_file, $target_path, null);
     exit(0);
 } catch (RuntimeException $e) {
-    fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
+    fwrite(STDERR, "Error: ".$e->getMessage()."\n");
     exit(1);
 }
 
