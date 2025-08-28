@@ -25,7 +25,7 @@ class PackageHelper
      *     from: __DIR__.'/stubs',
      *     to: sys_get_temp_dir().'/out',
      *     project_namespace: 'App\\Services',
-     *     on_copy: function ($from, $to) {
+     *     CopyEvent: function ($from, $to) {
      *         echo "Published $from -> $to\n";
      *     }
      * );
@@ -34,15 +34,15 @@ class PackageHelper
      * @param  string         $from               Source directory to publish (absolute or relative)
      * @param  string         $to                 Destination directory in the consuming project
      * @param  string         $project_namespace  Root namespace that corresponds to $to (e.g., 'App\\Services')
-     * @param  callable|null  $on_copy            Optional callback ($fromFile, $toFile) invoked per copied file
+     * @param  Closure|null  $CopyEvent          Optional callback ($fromFile, $toFile) invoked per copied file
      *
      * @return void
      * @throws RuntimeException If a directory cannot be created or a file cannot be written
      * @link https://github.com/zero-to-prod/package-helper
      */
-    public static function publish(string $from, string $to, string $project_namespace, ?callable $on_copy = null): void
+    public static function publish(string $from, string $to, string $project_namespace, Closure|null $CopyEvent = null): void
     {
-        (new self())->copyFiles($from, $to, $project_namespace, $on_copy);
+        (new self())->copyFiles($from, $to, $project_namespace, $CopyEvent);
     }
 
     /**
@@ -58,7 +58,7 @@ class PackageHelper
      * $to = PackageHelper::copy(
      *     source_file: __DIR__.'/README.md',
      *     target_path: sys_get_temp_dir().'/tmp-copy',
-     *     on_copy: function ($from, $to) {
+     *     CopyEvent: function ($from, $to) {
      *         echo "Copied $from -> $to\n";
      *     }
      * );
@@ -67,13 +67,13 @@ class PackageHelper
      *
      * @param  string         $source_file  The file to copy
      * @param  string|null    $target_path  Directory to copy into (created if missing); defaults to getcwd()
-     * @param  callable|null  $on_copy      Optional callback ($fromFile, $toFile)
+     * @param  Closure|null  $CopyEvent    Optional callback ($fromFile, $toFile)
      *
      * @return string The full path of the copied file
      * @throws RuntimeException If the source file is missing or target directory cannot be created/written
      * @link https://github.com/zero-to-prod/package-helper
      */
-    public static function copy(string $source_file, ?string $target_path = null, ?callable $on_copy = null): string
+    public static function copy(string $source_file, ?string $target_path = null, Closure|null $CopyEvent = null): string
     {
         $target_path = rtrim($target_path ?: getcwd(), '/').'/';
 
@@ -91,8 +91,8 @@ class PackageHelper
             throw new RuntimeException("Failed to copy {$source_file} to {$target_file}");
         }
 
-        if (is_callable($on_copy)) {
-            $on_copy($source_file, $target_file);
+        if (is_callable($CopyEvent)) {
+            $CopyEvent($source_file, $target_file);
         }
 
         return $target_file;
