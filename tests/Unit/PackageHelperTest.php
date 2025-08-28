@@ -139,6 +139,14 @@ class PackageHelperTest extends TestCase
         rmdir($dir);
     }
 
+    private function createSourceFile(string $name = 'test_file.txt', string $content = 'Test content'): string
+    {
+        $path = $this->testFromDir . '/' . $name;
+        file_put_contents($path, $content);
+        return $path;
+    }
+
+
     public function testFindNamespaceMappingThrowsExceptionForNoMatch(): void
     {
         $unknownDirectory = sys_get_temp_dir() . '/unknown-test';
@@ -163,5 +171,95 @@ class PackageHelperTest extends TestCase
 
         // Cleanup
         rmdir($unknownDirectory);
+    }
+
+    public function testCopyCopiesFileToDefaultPath(): void
+    {
+        $source_file = $this->createSourceFile();
+
+        $returned = PackageHelper::copy($source_file);
+
+        $this->assertFileExists($returned);
+        $this->assertStringContainsString('Test content', file_get_contents($returned));
+
+        unlink($returned);
+    }
+
+    public function testCopyCopiesFileToSpecifiedPath(): void
+    {
+        $source_file = $this->createSourceFile();
+
+        $custom_target_dir = $this->testToDir . '/custom/';
+        $returned = PackageHelper::copy($source_file, $custom_target_dir);
+
+        $this->assertFileExists($returned);
+        $this->assertStringContainsString('Test content', file_get_contents($returned));
+    }
+
+    public function testCopyCallsCopyEventWhenProvided(): void
+    {
+        $source_file = $this->createSourceFile();
+
+        $custom_target_dir = $this->testToDir . '/custom/';
+        $expected_target_file = $custom_target_dir . 'test_file.txt';
+
+        $callback_called = false;
+        $callback_from = null;
+        $callback_to = null;
+
+        $returned = PackageHelper::copy(
+            $source_file,
+            $custom_target_dir,
+            function ($from, $to) use (&$callback_called, &$callback_from, &$callback_to) {
+                $callback_called = true;
+                $callback_from = $from;
+                $callback_to = $to;
+            }
+        );
+
+        $this->assertTrue($callback_called);
+        $this->assertSame($source_file, $callback_from);
+        $this->assertSame($expected_target_file, $callback_to);
+        $this->assertSame($expected_target_file, $returned);
+    }
+
+    public function testCopyThrowsExceptionForNonExistentSourceFile(): void
+    {
+        $non_existent_file = $this->testFromDir . '/non_existent.txt';
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("Source file not found: {$non_existent_file}");
+
+        PackageHelper::copy($non_existent_file);
+    }
+
+    public function testCopyThrowsExceptionWhenTargetDirectoryCannotBeCreated(): void
+    {
+        $source_file = $this->testFromDir . '/test_file.txt';
+        file_put_contents($source_file, 'Test content');
+
+        // Ensure the test directory exists first
+        if (!is_dir($this->testToDir)) {
+            mkdir($this->testToDir, 0777, true);
+        }
+
+        // Create a file where we want a directory to force mkdir to fail
+        $blocking_file = $this->testToDir . '/blocking_file';
+        file_put_contents($blocking_file, 'blocking');
+        $invalid_target_dir = $blocking_file . '/subdir/';
+
+        $this->expectException(RuntimeException::class);
+
+        try {
+            PackageHelper::copy($source_file, $invalid_target_dir);
+        } catch (RuntimeException $e) {
+            // Check that the exception contains expected text about directory creation failure
+            $this->assertStringContainsString('Could not create target directory', $e->getMessage());
+            throw $e; // Re-throw to satisfy expectException
+        } finally {
+            if (file_exists($blocking_file)) {
+                unlink($blocking_file);
+            }
+        }
     }
 }
