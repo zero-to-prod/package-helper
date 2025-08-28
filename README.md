@@ -18,6 +18,7 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Documentation Publishing](#documentation-publishing)
+  - [Automatic Documentation Publishing](#automatic-documentation-publishing)
 - [Usage](#usage)
 - [Example](#example)
 - [Local Development](./LOCAL_DEVELOPMENT.md)
@@ -55,6 +56,23 @@ vendor/bin/zero-to-prod-package-helper
 
 # Publish to custom directory
 vendor/bin/zero-to-prod-package-helper /path/to/your/docs
+```
+
+#### Automatic Documentation Publishing
+
+You can automatically publish documentation by adding the following to your `composer.json`:
+
+```json
+{
+  "scripts": {
+    "post-install-cmd": [
+      "zero-to-prod-package-helper"
+    ],
+    "post-update-cmd": [
+      "zero-to-prod-package-helper"
+    ]
+  }
+}
 ```
 
 ## Usage
