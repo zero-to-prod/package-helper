@@ -43,5 +43,8 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
-    }
+    },
+    "bin": [
+        "bin/zero-to-prod-package-helper"
+    ]
 }

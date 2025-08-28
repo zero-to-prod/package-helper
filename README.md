@@ -17,6 +17,7 @@
 - [Introduction](#introduction)
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [Documentation Publishing](#documentation-publishing)
 - [Usage](#usage)
 - [Example](#example)
 - [Local Development](./LOCAL_DEVELOPMENT.md)
@@ -40,19 +41,53 @@ composer require zero-to-prod/package-helper
 
 This will add the package to your project’s dependencies and create an autoloader entry for it.
 
+## Documentation Publishing
+
+You can publish this README to your local documentation directory.
+
+This can be useful for providing documentation for AI agents.
+
+This can be done using the included script:
+
+```bash
+# Publish to default location (./docs/zero-to-prod/package-helper/)
+vendor/bin/zero-to-prod-package-helper
+
+# Publish to custom directory
+vendor/bin/zero-to-prod-package-helper /path/to/your/docs
+```
+
 ## Usage
 
-Publish files in your package directory.
+Publish files in your package directory (recursively) while rewriting namespaces.
 
 ```php
-use Zerotoprod\OmdbModels\PackageHelper;
+use Zerotoprod\PackageHelper\PackageHelper;
 
 PackageHelper::publish(
     $from,
     $to,
-    PackageHelper::findNamespaceMapping($psr_4, $to),
-    static function(string $from, string $to){
+    PackageHelper::determineNamespace($psr_4, $to),
+    static function (string $from, string $to) {
         echo "Copied: $from to $to" . PHP_EOL;
+    }
+);
+```
+
+Copy a single file and get the destination path:
+
+```php
+use Zerotoprod\PackageHelper\PackageHelper;
+
+$copied = PackageHelper::copy(__DIR__.'/stubs/example.txt');
+echo $copied; // e.g., getcwd().'/example.txt'
+
+// Or copy into a specific directory and observe the callback
+$copied = PackageHelper::copy(
+    __DIR__.'/stubs/example.txt',
+    getcwd().'/output',
+    static function (string $from, string $to) {
+        echo "Copied $from -> $to" . PHP_EOL;
     }
 );
 ```
