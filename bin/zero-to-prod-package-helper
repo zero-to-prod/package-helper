@@ -16,16 +16,15 @@ if (isset($argv[1])) {
     $target_path = rtrim($argv[1], '/').'/';
 }
 
-$source_file = getcwd().'/README.md';
+$source_file = __DIR__.'/../README.md';
 
 if (!file_exists($source_file)) {
     fwrite(STDERR, "Error: Not found $source_file\n");
     exit(1);
 }
 
-// Use PackageHelper to perform the copy (will create the target directory as needed)
 try {
-    PackageHelper::copy($source_file, $target_path, null);
+    PackageHelper::copy($source_file, $target_path);
     exit(0);
 } catch (RuntimeException $e) {
     fwrite(STDERR, "Error: ".$e->getMessage()."\n");
