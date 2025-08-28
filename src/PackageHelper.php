@@ -41,7 +41,7 @@ class PackageHelper
      * @throws RuntimeException If a directory cannot be created or a file cannot be written
      * @link https://github.com/zero-to-prod/package-helper
      */
-    public static function publish(string $from, string $to, string $project_namespace, ?Closure $CopyEvent): void
+    public static function publish(string $from, string $to, string $project_namespace, ?Closure $CopyEvent = null): void
     {
         (new self())->copyFiles($from, $to, $project_namespace, $CopyEvent ?? null);
     }
