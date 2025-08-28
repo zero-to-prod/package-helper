@@ -41,9 +41,9 @@ class PackageHelper
      * @throws RuntimeException If a directory cannot be created or a file cannot be written
      * @link https://github.com/zero-to-prod/package-helper
      */
-    public static function publish(string $from, string $to, string $project_namespace, Closure $CopyEvent = null): void
+    public static function publish(string $from, string $to, string $project_namespace, ?Closure $CopyEvent): void
     {
-        (new self())->copyFiles($from, $to, $project_namespace, $CopyEvent);
+        (new self())->copyFiles($from, $to, $project_namespace, $CopyEvent ?? null);
     }
 
     /**
@@ -74,7 +74,7 @@ class PackageHelper
      * @throws RuntimeException If the source file is missing or target directory cannot be created/written
      * @link https://github.com/zero-to-prod/package-helper
      */
-    public static function copy(string $source_file, ?string $target_path = null, Closure $CopyEvent = null): string
+    public static function copy(string $source_file, ?string $target_path = null, ?Closure $CopyEvent = null): string
     {
         $target_path = rtrim($target_path ?: getcwd(), '/').'/';
 
